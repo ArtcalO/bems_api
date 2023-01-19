@@ -27,8 +27,6 @@ class UserSerializer(serializers.ModelSerializer):
 	def update(self,instance,validated_data):
 		user = instance
 		username = validated_data.get('username')
-		first_name = validated_data.get('first_name')
-		last_name = validated_data.get('last_name')
 		nouv_password = validated_data.get('nouv_password')
 		anc_password = validated_data.get('anc_password')
 		if check_password(anc_password, self.context['request'].user.password):
@@ -49,6 +47,19 @@ class UserSerializer(serializers.ModelSerializer):
 				'validators':[UnicodeUsernameValidator()]
 			}
 		}
+
+class RegisterSerializer(serializers.Serializer):
+    username=serializers.CharField(required=True)
+    password=serializers.CharField(required=True)
+
+    class Meta:
+        fields = 'username', 'password'
+        extra_kwargs={
+            'username':{
+                'validators':[UnicodeUsernameValidator()]
+            },
+            'password': {'write_only': True}
+        }
 
 class BookSerializer(serializers.ModelSerializer):
 	class Meta:
