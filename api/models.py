@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+WISH_LIST = (
+	("R", "READ"),
+	("WR", "WISH READ")
+)
 #Django provides a built in User model that provides basics user table proprety
 #In this we eill not create another user table but we eill use the existing user model and 
 #Instead of using state we will use groups models for best relationship model
@@ -12,6 +17,7 @@ from django.contrib.auth.models import User
 
 class Book(models.Model):
 	id = models.AutoField(primary_key=True) # primary_key parameter set to true mean taht this field is the key
+	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 	book_name = models.CharField(max_length=50)
 	publish_date = models.DateTimeField()
 	publisher = models.CharField(max_length=50)
@@ -34,11 +40,14 @@ class BookComment(models.Model):
 	user_id = models.ForeignKey(User, on_delete=models.CASCADE)
 	post_date = models.DateTimeField(auto_now=True) # we set auto_now parameter to true comment takes by efaut the current time it posted
 
+	class Meta:
+		unique_together = ('book_id', 'user_id')
 
 class UserWishing(models.Model):
 	id = models.AutoField(primary_key=True)
+	user_id = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
 	book_id = models.ForeignKey(Book, on_delete=models.CASCADE)
-	type = models.IntegerField(default=0)
+	type_wishing = models.CharField(max_length=10,null=True, blank=True,choices=WISH_LIST)
 	add_date = models.DateTimeField(auto_now=True)
 
 

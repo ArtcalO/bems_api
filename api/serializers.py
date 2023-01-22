@@ -12,6 +12,7 @@ class TokenPairSerializer(TokenObtainPairSerializer):
 		data['groups'] = [group.name for group in self.user.groups.all()]
 		data['username'] = self.user.username
 		data['id'] = self.user.id
+		data['is_admin'] = self.user.is_superuser
 		data['first_name'] = self.user.first_name
 		data['last_name'] = self.user.last_name
 		return data
@@ -66,6 +67,14 @@ class BookSerializer(serializers.ModelSerializer):
 		model = Book
 		fields = "__all__"
 class BookCommentSerializer(serializers.ModelSerializer):
+
+	def to_representation(self,instance):
+		representation = super().to_representation(instance)
+		representation['user_id'] = {
+			'id':instance.user_id.id,
+			'username':instance.user_id.username
+		}
+		return representation
 	class Meta:
 		model = BookComment
 		fields = "__all__"
