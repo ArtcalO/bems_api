@@ -135,6 +135,14 @@ class UserWishingViewSet(viewsets.ModelViewSet):
 
 	@action(methods=["GET"], detail=False, url_name=r"fetch-wish",url_path=r"fetch-wish",permission_classes=[IsAuthenticated])
 	def fetchWishList(self, request):
-		q = UserWishing.objects.all().group_by('book_id')
-		serializer = UserWishingSerializer(q, many=True)
-		return Response(serializer.data)
+		read = list(UserWishing.objects.filter(type_wishing="R").values_list('book_id', flat=True))
+		wish_read = list(UserWishing.objects.filter(type_wishing="WR").values_list('book_id', flat=True))
+		
+		book_read = BookSerializer(Book.objects.filter(id__in=read),many=True).data
+		book_wish_read = BookSerializer(Book.objects.filter(id__in=wish_read), many=True).data
+
+
+		return Response({
+			"book_read":book_read,
+			"book_wish_read":book_wish_read
+			},200)
